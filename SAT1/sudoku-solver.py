@@ -1,4 +1,4 @@
-from flo_sat_encoder import *
+from SAT1.flo_sat_encoder import *
 solver = "/home/jingcheng/下载/cadical-sc2020-45029f8/build/cadical"
 grid = [list(input()) for i in range(9)]
 
