@@ -118,7 +118,7 @@ class SAT1Solver():
         self.small_search_space=sorted(self.small_search_space)
 
     def ClauseMaker(self):
-        self.small_search_space_index=[int(i) for i in range(0, len(self.small_search_space))]
+        self.small_search_space_index=[int(i) for i in range(1, len(self.small_search_space)+1)]
         print(self.small_search_space_index)
         self.clauses = []
         for row_index in range(len(self.row_constraint)):
@@ -126,9 +126,10 @@ class SAT1Solver():
             space=[]
             for j in range(len(self.small_search_space)):
                 if self.small_search_space[j][0]==row_index:
-                    space.append(self.small_search_space[j])
+                    space.append(self.small_search_space_index[j])
             # print(space)
-            var_indexs=[self.PositioanToVar(i) for i in space]
+            # var_indexs=[self.PositioanToVar(i) for i in space]
+            var_indexs=space
             # print(row_con)
             if len(var_indexs)==row_con:
                 for v in var_indexs:
@@ -140,8 +141,7 @@ class SAT1Solver():
                 line_clause1,cluase_number1=self.Combinations(var_indexs1,row_con+1)
                 for each in line_clause1:
                     self.clauses.append(each)
-
-                line_clause0,cluase_number0=self.Combinations(var_indexs,self.size[0]-row_con+1)
+                line_clause0,cluase_number0=self.Combinations(var_indexs, len(var_indexs) - row_con + 1)
                 for each in line_clause0:
                     self.clauses.append(each)
         print(self.clauses)
@@ -150,9 +150,10 @@ class SAT1Solver():
             space=[]
             for j in range(len(self.small_search_space)):
                 if self.small_search_space[j][1]==col_index:
-                    space.append(self.small_search_space[j])
+                    space.append(self.small_search_space_index[j])
             # print(space)
-            var_indexs=[self.PositioanToVar(i) for i in space]
+            # var_indexs=[self.PositioanToVar(i) for i in space]
+            var_indexs=space
             # print(col_con)
             if len(var_indexs)==col_con:
                 for v in var_indexs:
@@ -164,7 +165,7 @@ class SAT1Solver():
                 line_clause1,cluase_number1=self.Combinations(var_indexs1,col_con+1)
                 for each in line_clause1:
                     self.clauses.append(each)
-                line_clause0,cluase_number0=self.Combinations(var_indexs,self.size[0]-col_con+1)
+                line_clause0,cluase_number0=self.Combinations(var_indexs, len(var_indexs) - col_con + 1)
                 for each in line_clause0:
                     self.clauses.append(each)
         # print(self.clauses)
@@ -178,12 +179,12 @@ class SAT1Solver():
         for i in range(len(clauses)):
             line=[]
             for item in clauses[i]:
-                line.append(item.item())
+                if type(item)!=int:line.append(item.item())
+                else:line.append(item)
             transform_clauses.append(line)
         s=Solver(name='cadical')
-        print(transform_clauses[0])
-
         for item in transform_clauses:
+            print(item)
             s.add_clause(item)
         print(s.solve())
         print(s.get_model())
