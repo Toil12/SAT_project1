@@ -12,7 +12,12 @@ class SAT1Solver():
         self.row_constraint = map['row_number']
         self.column_constraint = map['column_number']
         self.envrionment = map['environment']
+        self.result=[]
+
+    def Run(self):
         self.PreProcessor()
+        self.ClauseMaker()
+        self.Solver()
 
     def Combinations(self,L, k):
         n = len(L)
@@ -28,7 +33,7 @@ class SAT1Solver():
                 result.append([L[i]])
         return result, len(result)
 
-    def GetNeighbours(self, x, y, directions=4):
+    def GetNeighbours(self, x, y, directions=4)->list:
         neighbours = []
         if directions == 4:
             if x - 1 < 0:
@@ -101,36 +106,55 @@ class SAT1Solver():
             if self.small_search_space[i]==item:
                 return int(i)
 
+    def SmallSpaceIndex(self, tup, room=None):
+        if room == None:
+            room = self.small_search_space
+        for i in range(len(room)):
+            if room[i] == tup:
+                return int(i+1)
+            else:
+                continue
+
     def PreProcessor(self):
-        self.var=np.zeros((self.size[0],self.size[1]*3))
         self.small_search_space=[]
         trees=[]
         for i in range(self.size[0]):
             for j in range(self.size[1]):
                 if self.envrionment[i,j]==-1:
-                    self.var[i,3*(j+1)-1]=1
                     trees.append((i,j))
         for cell in trees:
             neighbours=self.GetNeighbours(cell[0],cell[1])
             for neighbour in neighbours:
-                if neighbour!=None and neighbour not in self.small_search_space:
+                if neighbour!=None \
+                        and neighbour not in self.small_search_space \
+                        and self.envrionment[neighbour[0],neighbour[1]]!=-1:
                     self.small_search_space.append(neighbour)
         self.small_search_space=sorted(self.small_search_space)
 
+
+    def NeighbourFilter(self,neigbour,room=None):
+        valid_neighbour=[]
+        if room==None:
+            room=self.small_search_space
+        for item in neigbour:
+            if item in room and item!=None and item!=-1:
+                valid_neighbour.append(item)
+            else:
+                continue
+        return valid_neighbour
+
     def ClauseMaker(self):
         self.small_search_space_index=[int(i) for i in range(1, len(self.small_search_space)+1)]
-        print(self.small_search_space_index)
         self.clauses = []
+        #row constraints
         for row_index in range(len(self.row_constraint)):
             row_con=self.row_constraint[row_index]
             space=[]
             for j in range(len(self.small_search_space)):
                 if self.small_search_space[j][0]==row_index:
                     space.append(self.small_search_space_index[j])
-            # print(space)
-            # var_indexs=[self.PositioanToVar(i) for i in space]
+
             var_indexs=space
-            # print(row_con)
             if len(var_indexs)==row_con:
                 for v in var_indexs:
                     self.clauses.append([v])
@@ -144,17 +168,15 @@ class SAT1Solver():
                 line_clause0,cluase_number0=self.Combinations(var_indexs, len(var_indexs) - row_con + 1)
                 for each in line_clause0:
                     self.clauses.append(each)
-        print(self.clauses)
+        # column constrians
         for col_index in range(len(self.column_constraint)):
             col_con=self.column_constraint[col_index]
             space=[]
             for j in range(len(self.small_search_space)):
                 if self.small_search_space[j][1]==col_index:
                     space.append(self.small_search_space_index[j])
-            # print(space)
-            # var_indexs=[self.PositioanToVar(i) for i in space]
+
             var_indexs=space
-            # print(col_con)
             if len(var_indexs)==col_con:
                 for v in var_indexs:
                     self.clauses.append([v])
@@ -168,14 +190,23 @@ class SAT1Solver():
                 line_clause0,cluase_number0=self.Combinations(var_indexs, len(var_indexs) - col_con + 1)
                 for each in line_clause0:
                     self.clauses.append(each)
-        # print(self.clauses)
-        print(len(self.clauses))
+
+        for i in range(len(self.small_search_space)):
+            x=self.small_search_space[i][0]
+            y=self.small_search_space[i][1]
+            neighbour=self.GetNeighbours(x,y,directions=8)
+            neighbour=self.NeighbourFilter(neighbour)
+            for n in neighbour:
+                nindex=-self.SmallSpaceIndex(n)
+                if [-i,nindex] in self.clauses or [nindex,-i] in self.clauses:
+                    continue
+                else:
+                    self.clauses.append([-(i+1),nindex])
 
     def Solver(self,clauses=None):
         transform_clauses=[]
         if clauses==None:
             clauses=np.array(self.clauses)
-        print(clauses.shape)
         for i in range(len(clauses)):
             line=[]
             for item in clauses[i]:
@@ -184,22 +215,23 @@ class SAT1Solver():
             transform_clauses.append(line)
         s=Solver(name='cadical')
         for item in transform_clauses:
-            print(item)
             s.add_clause(item)
-        print(s.solve())
-        print(s.get_model())
-
-
+        self.result_tag=s.solve()
+        if self.result==True:
+            result_list=s.get_model()
+            for index in result_list:
+                if index>0:
+                    sindex=int(np.abs(index).item()-1)
+                    self.result.append(self.small_search_space[sindex])
+                else:
+                    continue
+        else:
+            print('gg')
 
 if __name__ == '__main__':
-    file_name = 'tents-8x8-t1.txt'
+    file_name = 'tents-25x30-t.txt'
     name = file_name.split('.')[0]
     map = FileOperation.ReadFile(file_name)
     sol=SAT1Solver(map)
-    sol.PreProcessor()
-    sol.ClauseMaker()
-    sol.Solver()
-    # print(sol.envrionment)
-    # print(sol.small_search_space)
-    # print(len(sol.small_search_space))
-    # print(sol.PositioanToVar((3,3)))
+    sol.Run()
+    print(sol.result_tag)

@@ -8,6 +8,7 @@ import time
 
 from SAT1.GridMaker import GridMaker
 from SAT1.FileOperation import FileOperation
+from SAT1.Solver import SAT1Solver
 from PyQt5.QtWidgets import (QWidget, QGridLayout,
                              QPushButton, QApplication,
                              QLabel)
@@ -132,16 +133,22 @@ class GUI(QWidget):
 
 
     def Solve(self):
-        default=np.zeros((self.size[0],self.size[1]))
-        # print(1)
-        for i in range(self.size[0]):
-            for j in range(self.size[1]):
-                name = self.glayout.itemAtPosition(i,j).widget().objectName()
+        sol=SAT1Solver(self.data)
+        sol.Run()
+        sol_list=sol.result
+        sol_tag=sol.result_tag
+        if sol_tag==False:
+            QMessageBox.warning(self,"Result","Not solveable",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+        else:
+            for position in sol_list:
+                x=int(position[0])
+                y=int(position[1])
+                name = self.glayout.itemAtPosition(x,y).widget().objectName()
                 item = self.findChild(QPushButton, name)
-                item.setText(str(default[i,j]))
+                item.setText('O')
 
     def AutoMakerItemSetting(self):
-        item=['none','8x8','10x10','15x10','25x25']
+        item=['none','8x8','10x10','15x10','25x25','30x30']
         self.auto_make_butoon.addItems(item)
 
     def AutoMakerAction(self,k):
