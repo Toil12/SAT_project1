@@ -35,7 +35,11 @@ class Solver():
         self.row_constraint
         self.column_constraint
         self.small_search_space
-        [][]
+
+        for cell in self.small_search_space:
+            pass
+
+        # def F()
 
 
 
@@ -108,8 +112,8 @@ class Solver():
     def PositioanToVar(self,positon:tuple):
         x=positon[0]
         y=positon[1]
-        se=(x*self.size[0])+y
-        return se*3
+        se=((x)*self.size[0])+y+1
+        return se
 
     def ReturnIndex(self,item):
         for i in range(len(self.small_search_space)):
