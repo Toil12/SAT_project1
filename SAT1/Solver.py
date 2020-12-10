@@ -2,8 +2,8 @@ from SAT1.FileOperation import FileOperation
 from pysat.solvers import Solver
 import numpy as np
 TENT=1
-EMPTY=2
-TREE=3
+EMPTY=0
+TREE=-1
 
 class SAT1Solver():
     def __init__(self,map:dict):
