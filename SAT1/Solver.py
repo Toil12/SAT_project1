@@ -217,7 +217,7 @@ class SAT1Solver():
         for item in transform_clauses:
             s.add_clause(item)
         self.result_tag=s.solve()
-        if self.result==True:
+        if self.result_tag==True:
             result_list=s.get_model()
             for index in result_list:
                 if index>0:
