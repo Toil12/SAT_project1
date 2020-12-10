@@ -1,4 +1,7 @@
-import random
+from pysat.solvers import Solver, Minisat22
 
-for k in range(30):
-    print(random.randint(0,5))
+s = Solver(name='cadical')
+s.add_clause([-1, 2])
+s.add_clause([-1, -3])
+k=s.solve()
+print(k)
