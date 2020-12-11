@@ -102,6 +102,7 @@ class MakeBoard(QWidget):
     def SaveAction(self):
         row_cons=[]
         col_cons=[]
+        right_tag=False
         file_name=self.save_name_edit.text()
         for r in self.row_all_cons:
             temp=r.text()
@@ -110,24 +111,35 @@ class MakeBoard(QWidget):
                                     QMessageBox.Yes)
                 break
             else:
-                if temp!=None:
+                if int(temp)>self.row_size:
+                    QMessageBox.warning(self, "Warning", "Over row size",
+                                        QMessageBox.Yes,
+                                        QMessageBox.Yes)
+                    break
+                elif temp!=None:
                     row_cons.append(int(temp))
         for c in self.col_all_cons:
             temp=c.text()
             if not self.is_number(temp):
-                QMessageBox.warning(self, "Warning", "Column constrains must be integer", QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.warning(self, "Warning","Column constrains must be integer" , QMessageBox.Yes,
                                     QMessageBox.Yes)
                 break
             else:
-                if temp!=None:
+                if int(temp)>self.column_size:
+                    QMessageBox.warning(self, "Warning", "Over column size",
+                                        QMessageBox.Yes,
+                                        QMessageBox.Yes)
+                    break
+                elif temp!=None :
                     col_cons.append(int(temp))
+                    right_tag=True
         prefix='env'
         suffix=''
         type='.txt'
         if file_name=='':
             QMessageBox.warning(self, "Warning", "File name is empty", QMessageBox.Yes | QMessageBox.No,
                                 QMessageBox.Yes)
-        else:
+        elif right_tag:
             path = os.path.join(prefix, 'tents'+file_name+'-%dx%d'%(int(self.row_size),int(self.column_size))+'-mk'+type)
             with open(path, "w") as f:
                     f.write(str(self.row_size)+' '+str(self.column_size)+'\n')
@@ -147,7 +159,7 @@ class MakeBoard(QWidget):
                     f.write(str(col_cons[-1]))
             f.close()
             self.save_state.setText('save successed')
-            time.sleep(1)
+            time.sleep(5)
             self.close()
             default_file_name = 'tents-8x8-t1.txt'
             name = default_file_name.split('.')[0]
