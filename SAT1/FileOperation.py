@@ -60,11 +60,6 @@ class FileOperation:
         for root, dirs, files in os.walk(path):
             return files
 
-
-
-
-
-
 if __name__ == '__main__':
     file="tents-25x30-t.txt"
     result=FileOperation.ReadFile(file)

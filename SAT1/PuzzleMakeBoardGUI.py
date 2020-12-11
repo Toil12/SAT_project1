@@ -166,12 +166,6 @@ class MakeBoard(QWidget):
             map = FileOperation.ReadFile(default_file_name)
             self.b_gui = mgui.GUI(map, name)
 
-
-        # print(row_cons)
-        # print(col_cons)
-        # self.close()
-        # self.make_board =
-
     def EnvAction(self):
         sender=self.sender()
         objname = str(sender.objectName())
