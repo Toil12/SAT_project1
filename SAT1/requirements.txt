@@ -1,4 +1,0 @@
-numpy==1.18.5
-python_sat==0.1.6.dev11
-PyQt5==5.15.2
-pysat==2.2.2
