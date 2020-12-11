@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import time
 
+from SAT1.SettingBoardGUI import ManualBoard
 from SAT1.GridMaker import GridMaker
 from SAT1.FileOperation import FileOperation
 from SAT1.Solver import SAT1Solver
@@ -51,7 +52,7 @@ class GUI(QWidget):
     def InitUI(self):
         self.wlayout=QHBoxLayout()
         self.vlayout=QVBoxLayout()
-        self.glayout = QGridLayout()
+        self.glayout=QGridLayout()
 
         #grid setting
         #environment
@@ -88,20 +89,31 @@ class GUI(QWidget):
         self.solve_button.setObjectName('solve_button')
         self.solve_button.clicked.connect(self.Solve)
 
+        self.manually_make_button=QPushButton('Manually Make')
+        self.manually_make_button.setObjectName('manul_make')
+        self.manually_make_button.clicked.connect(self.ManualMaker)
+
+        self.load_label=QLabel('choose puzzle:')
+        self.load_label.setFixedSize(120,20)
         self.load_button=QComboBox()
         self.load_button.setObjectName('load_button')
         self.LoadItemsetting()
         self.load_button.currentTextChanged.connect(self.LoadAction)
 
+        self.auto_make_label=QLabel('auto puzzle make:')
+        self.auto_make_label.setFixedSize(120,20)
         self.auto_make_butoon=QComboBox()
         self.auto_make_butoon.setObjectName('auto_make_button')
         self.AutoMakerItemSetting()
         self.auto_make_butoon.currentTextChanged.connect(self.AutoMakerAction)
 
+        self.vlayout.setSpacing(0)
         self.vlayout.addWidget(self.solve_button)
+        self.vlayout.addWidget(self.manually_make_button)
+        self.vlayout.addWidget(self.auto_make_label)
         self.vlayout.addWidget(self.auto_make_butoon)
+        self.vlayout.addWidget(self.load_label)
         self.vlayout.addWidget(self.load_button)
-
 
         gwg = QWidget()
         vwg = QWidget()
@@ -113,12 +125,9 @@ class GUI(QWidget):
         self.wlayout.addWidget(vwg)
 
         self.setLayout(self.wlayout)
-        #
-
         self.setWindowTitle(self.name)
         self.Centralization()
         self.show()
-
 
     def LoadItemsetting(self):
         self.file_list=FileOperation.GetFileNameList()
@@ -130,7 +139,6 @@ class GUI(QWidget):
         new_name = file_name.split('.')[0]
         map = FileOperation.ReadFile(newfile_name)
         self.new_gui = GUI(map, new_name)
-
 
     def Solve(self):
         sol=SAT1Solver(self.data)
@@ -164,6 +172,13 @@ class GUI(QWidget):
             self.closewin()
             time.sleep(0.1)
             self.auto_puzzle=GUI(new_map,'auto'+k)
+
+    def ManualMaker(self):
+        self.closewin()
+        self.board=ManualBoard()
+
+
+
 
 if __name__ == '__main__':
     file_name = 'tents-8x8-t1.txt'

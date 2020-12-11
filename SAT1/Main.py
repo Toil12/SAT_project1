@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from SAT1.GUI import GUI
+from SAT1.MainGUI import GUI
 from SAT1.FileOperation import FileOperation
 
 if __name__ == '__main__':
