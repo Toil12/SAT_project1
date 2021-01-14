@@ -65,7 +65,7 @@ class GridMaker():
                             if i == 3:
                                 self.grid[x][y-1] = TREE
                             placed = True
-                        tries=0
+                        tries+=1
 
     def RemoveTents(self):
         for x in range(self.size[0]):

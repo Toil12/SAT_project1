@@ -131,7 +131,6 @@ class SAT1Solver():
                     self.small_search_space.append(neighbour)
         self.small_search_space=sorted(self.small_search_space)
 
-
     def NeighbourFilter(self,neigbour,room=None):
         valid_neighbour=[]
         if room==None:
@@ -159,7 +158,8 @@ class SAT1Solver():
                 for v in var_indexs:
                     self.clauses.append([v])
             elif row_con==0:
-                continue
+                for item in var_indexs:
+                    self.clauses.append([-item])
             else:
                 var_indexs1=[-i for i in var_indexs]
                 line_clause1,cluase_number1=self.Combinations(var_indexs1,row_con+1)
@@ -181,7 +181,8 @@ class SAT1Solver():
                 for v in var_indexs:
                     self.clauses.append([v])
             elif col_con==0:
-                continue
+                for item in var_indexs:
+                    self.clauses.append([-item])
             else:
                 var_indexs1=[-i for i in var_indexs]
                 line_clause1,cluase_number1=self.Combinations(var_indexs1,col_con+1)
@@ -202,6 +203,26 @@ class SAT1Solver():
                     continue
                 else:
                     self.clauses.append([-(i+1),nindex])
+
+        for item in self.small_search_space:
+            tree_space=[]
+            neighbours=self.GetNeighbours(item[0],item[1],4)
+            count=0
+            for each in neighbours:
+                if each!=None:
+                    if self.envrionment[each[0],each[1]]==-1:
+                        count+=1
+                    else:
+                        continue
+                else:
+                    continue
+            if count>=2:
+                k=self.SmallSpaceIndex(item)
+                print('dd')
+                print(k)
+                self.clauses.append([-self.SmallSpaceIndex(item)])
+
+        print(self.clauses)
 
     def Solver(self,clauses=None):
         transform_clauses=[]
@@ -229,7 +250,7 @@ class SAT1Solver():
             print('gg')
 
 if __name__ == '__main__':
-    file_name = 'tents-25x30-t.txt'
+    file_name = 'tents-8x8-e1.txt'
     name = file_name.split('.')[0]
     map = FileOperation.ReadFile(file_name)
     sol=SAT1Solver(map)
