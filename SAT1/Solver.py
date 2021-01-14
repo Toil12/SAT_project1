@@ -198,7 +198,7 @@ class SAT1Solver():
             neighbour=self.NeighbourFilter(neighbour)
             for n in neighbour:
                 nindex=-self.SmallSpaceIndex(n)
-                if [-i,nindex] in self.clauses or [nindex,-i] in self.clauses:
+                if [-(i+1),nindex] in self.clauses or [nindex,-(i+1)] in self.clauses:
                     continue
                 else:
                     self.clauses.append([-(i+1),nindex])
