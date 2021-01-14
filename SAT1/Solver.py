@@ -143,6 +143,13 @@ class SAT1Solver():
         return valid_neighbour
 
     def ClauseMaker(self):
+        self.tree_count=0
+        for row in self.envrionment:
+            for each in row:
+                if each==TREE:
+                    self.tree_count+=1
+                else:
+                    continue
         self.small_search_space_index=[int(i) for i in range(1, len(self.small_search_space)+1)]
         self.clauses = []
         #row constraints
@@ -204,26 +211,6 @@ class SAT1Solver():
                 else:
                     self.clauses.append([-(i+1),nindex])
 
-        for item in self.small_search_space:
-            tree_space=[]
-            neighbours=self.GetNeighbours(item[0],item[1],4)
-            count=0
-            for each in neighbours:
-                if each!=None:
-                    if self.envrionment[each[0],each[1]]==-1:
-                        count+=1
-                    else:
-                        continue
-                else:
-                    continue
-            if count>=2:
-                k=self.SmallSpaceIndex(item)
-                print('dd')
-                print(k)
-                self.clauses.append([-self.SmallSpaceIndex(item)])
-
-        print(self.clauses)
-
     def Solver(self,clauses=None):
         transform_clauses=[]
         if clauses==None:
@@ -238,16 +225,25 @@ class SAT1Solver():
         for item in transform_clauses:
             s.add_clause(item)
         self.result_tag=s.solve()
+
+        result_list = s.get_model()
         if self.result_tag==True:
-            result_list=s.get_model()
             for index in result_list:
-                if index>0:
-                    sindex=int(np.abs(index).item()-1)
+                if index > 0:
+                    sindex = int(np.abs(index).item() - 1)
                     self.result.append(self.small_search_space[sindex])
                 else:
                     continue
         else:
             print('gg')
+            return
+
+        if len(self.result)!=self.tree_count:
+            self.result_tag=False
+            print('gg')
+            return
+        else:
+            return
 
 if __name__ == '__main__':
     file_name = 'tents-8x8-e1.txt'
@@ -255,4 +251,4 @@ if __name__ == '__main__':
     map = FileOperation.ReadFile(file_name)
     sol=SAT1Solver(map)
     sol.Run()
-    print(sol.result_tag)
+    print(sol.result)
